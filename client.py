@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         self.commands = QLineEdit()
         self.commands.setMaximumHeight(25)
         self.envoyer = QPushButton("Envoyer")
+        self.envoyer.clicked.connect(self.envoi)
         self.conn = QLabel("IP du Serveur :")
         self.ip = QLineEdit()
         self.conn2 = QPushButton("Se connecter")
@@ -40,6 +41,7 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.conn2, 6, 3)
         widget.setLayout(grid)
         self.setWindowTitle("Gestionnaire de Serveurs")
+        self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def Toolbar(self):
         quitter = QAction('&Quitter', self)
@@ -55,6 +57,7 @@ class MainWindow(QMainWindow):
         kill.setStatusTip('Arrêter le serveur depuis l\'interface client.')
         reset.setStatusTip('Réinitialiser la connexion entre le client et le serveur.')
         quitter.triggered.connect(qApp.quit)
+        disconnect.triggered.connect(self.deconnection)
         self.statusBar()
         menubar = self.menuBar()
         Menu = menubar.addMenu('&Menu')
@@ -64,7 +67,6 @@ class MainWindow(QMainWindow):
         Menu.addAction(reset)
 
     def connect(self):
-        socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             host = ipaddress.ip_address(self.ip.text())
         except ValueError:
@@ -76,21 +78,50 @@ class MainWindow(QMainWindow):
         else:
             try:
                 host = str(self.ip.text())
-                socket_client.connect((host, 10000))
-            except ConnectionRefusedError:
+                self.socket_client.connect((host, 10000))
+            except socket.error:
                 msg = QMessageBox()
                 msg.setText("Erreur !")
-                msg.setInformativeText('Connexion refusée.')
+                msg.setInformativeText('Connexion impossible ou refusée.')
                 msg.setWindowTitle("Erreur !")
                 msg.exec_()
             else:
                 pseudo, entrer = QInputDialog.getText(self, "Connexion réussie.", "Veuillez entrer votre pseudo :", QLineEdit.Normal, "")
                 if entrer:
                     pseudo = pseudo
-                socket_client.send(pseudo.encode())
-                serverpseudo = socket_client.recv(1024).decode()
-                
+                self.socket_client.send(pseudo.encode())
+                serverpseudo = self.socket_client.recv(1024).decode()
     
+    def envoi(self):
+        try:
+            envoi = self.commands.text()
+            self.socket_client.send(envoi.encode())
+        except socket.error:
+            msg = QMessageBox()
+            msg.setText("Erreur !")
+            msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
+            msg.setWindowTitle("Erreur !")
+            msg.exec_()
+        else:
+            pass
+
+    def deconnection(self):
+        try:
+            bye = "bye"
+            self.socket_client.send(bye.encode())
+        except socket.error:
+            msg = QMessageBox()
+            msg.setText("Erreur !")
+            msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
+            msg.setWindowTitle("Erreur !")
+            msg.exec_()
+        else:
+            self.socket_client.close()
+            msg = QMessageBox()
+            msg.setText("Déconnecté avec succès.")
+            msg.setWindowTitle("Déconnexion")
+            msg.exec_()
+
 app = QApplication.instance() 
 
 if not app:

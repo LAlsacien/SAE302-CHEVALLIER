@@ -16,8 +16,15 @@ while True:
     while data!="exit" and data!="bye":
         data = conn.recv(2048).decode()
         print(f"\n{usname} > {data}")
-        msg = input(f'\n{usnameserver} > ')
-        conn.send(msg.encode())
+        msg = f'\n{usnameserver} > OK'
+        print(msg)
+        try:
+            conn.send(msg.encode())
+        except socket.error:
+            conn.close()
+        else:
+            pass
+    
     conn.close()
     rep = input("Continuer ? (y/n)")
     if rep == "n":
