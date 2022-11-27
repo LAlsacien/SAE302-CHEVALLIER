@@ -1,57 +1,65 @@
 import sys
-from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import *
 import threading
 import requests
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super().__init__()  
+        self.Toolbar()
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        grid = QGridLayout()
+        self.inf = QLabel("Commandes simples")
+        self.buttos = QPushButton("OS")
+        self.buttram = QPushButton("RAM")
+        self.buttcpu = QPushButton("CPU")
+        self.buttip = QPushButton("IP")
+        self.buttname = QPushButton("Nom")
+        self.chat = QTextEdit()
+        self.commands = QTextEdit()
+        self.commands.setMaximumHeight(25)
+        self.envoyer = QPushButton("Envoyer")
+        grid.addWidget(self.inf, 0, 0)
+        grid.addWidget(self.buttos, 1,0)
+        grid.addWidget(self.buttram, 1, 1)
+        grid.addWidget(self.buttcpu, 1, 2)
+        grid.addWidget(self.buttip, 1, 3)
+        grid.addWidget(self.buttname, 1, 4)
+        grid.addWidget(self.chat, 2, 0, 3, 5)
+        grid.addWidget(self.commands, 5, 0, 1, 4)
+        grid.addWidget(self.envoyer, 5, 4)
+        widget.setLayout(grid)
+        self.setWindowTitle("Gestionnaire de Serveurs")
 
-        self.chat = []
-        self.widget = QWidget()
-        self.setCentralWidget(self.widget)
-        self.layout = QVBoxLayout(self.widget)
-
-        self.client = QScrollArea(self)
-        self.client.resize(400,300)
-        self.client.setWidget(self.widget)
-        self.client.setWidgetResizable(True)
-
-        self.commands = QTextEdit(self)
-        self.commands.move(0,305)
-        self.commands.resize(400,50)
-
-        self.button = QPushButton(self)
-        self.button.move(0,360)
-        self.button.setText("Envoyer")
-        self.button.clicked.connect(self.envoi)
-
-        
-    def envoi(self):
-        envoi = self.commands.text()
-        text = QTextEdit(self)
-        text.document().setPlainText()
-        
-        font = text.document().defaultFont()
-        fontMetrics = QFontMetrics(font)
-        textSize = fontMetrics.size(0, text.toPlainText())
-
-        w = textSize.width() + 10
-        h = textSize.height() + 10
-        text.setMinimumSize(w, h)
-        text.setMaximumSize(w, h)
-        text.resize(w, h)
-
-        text.setReadOnly(True)
-        self.layout.addWidget(text)
-
+    def Toolbar(self):
+        quitter = QAction('&Quitter', self)
+        disconnect = QAction('&Déconnecter', self)
+        kill = QAction('&Tuer', self)
+        reset = QAction('&Réinitialiser', self)
+        quitter.setShortcut('Ctrl+Q')
+        disconnect.setShortcut('Ctrl+D')
+        kill.setShortcut('Ctrl+K')
+        reset.setShortcut('Ctrl+R')
+        quitter.setStatusTip('Quitter l\'application.')
+        disconnect.setStatusTip('Se déconnecter du serveur.')
+        kill.setStatusTip('Arrêter le serveur depuis l\'interface client.')
+        reset.setStatusTip('Réinitialiser la connexion entre le client et le serveur.')
+        quitter.triggered.connect(qApp.quit)
+        self.statusBar()
+        menubar = self.menuBar()
+        Menu = menubar.addMenu('&Menu')
+        Menu.addAction(quitter)
+        Menu.addAction(disconnect)
+        Menu.addAction(kill)
+        Menu.addAction(reset)
+    
 app = QApplication.instance() 
+
 if not app:
     app = QApplication(sys.argv)
     
 sae32 = MainWindow()
-sae32.resize(600, 400)
 sae32.show()
 
 app.exec_()
