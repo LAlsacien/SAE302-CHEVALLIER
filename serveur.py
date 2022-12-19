@@ -1,6 +1,9 @@
 import socket
 import sys
 import platform
+import subprocess
+import psutil
+import os
 
 host = "0.0.0.0"
 port = 10000
@@ -30,22 +33,33 @@ while data != "kill":
                     envoi = f"Commande spécifiée : OS ---> {platform.system()} {platform.release()}"
                     conn.send(envoi.encode())
                 elif data == "cpu":
-                    envoi = f"Commande spécifiée : CPU --->"
+                    envoi = f"Commande spécifiée : CPU ---> {psutil.cpu_percent()}% utilisé."
                     conn.send(envoi.encode())
                 elif data == "ip":
-                    envoi = f"Commande spécifiée : IP --->"
+                    ip_address = "Non disponible"
+                    try:
+                        ip_address = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][0]
+                    except:
+                        pass
+                    envoi = f"Commande spécifiée : IP ---> {ip_address}"
                     conn.send(envoi.encode())
                 elif data == "nom":
-                    envoi = f"Commande spécifiée : NOM --->"
+                    envoi = f"Commande spécifiée : NOM ---> {platform.node()}"
                     conn.send(envoi.encode())
                 elif data == "ram":
-                    envoi = f"Commande spécifiée : RAM --->"
+                    envoi = f"Commande spécifiée : RAM ---> {round(psutil.virtual_memory()[3]/1000000000, 2)}Go / {round(psutil.virtual_memory()[0]/1000000000, 2)}Go --> {round(psutil.virtual_memory()[4]/1000000000, 2)}Go libre."
                     conn.send(envoi.encode())
                 else:
-                    envoi = f"Commande spécifiée introuvable."
-                    conn.send(envoi.encode())
-
-
+                    if data != "kill" and data!="reset" and data!="disconnect":
+                        result = subprocess.run(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        result2 = result.stdout.decode('cp1252')
+                        if result2 == "":
+                            result2 = "Commande effectuée."
+                        envoi = f"Commande spécifiée : {data} ---> {result2}"
+                        conn.send(envoi.encode())
+                    else:
+                        pass
+                    
             if data == "disconnect":
                 data = ""
                 print(f"Déconnecté avec succès.")

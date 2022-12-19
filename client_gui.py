@@ -5,7 +5,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import socket
 import ipaddress
-import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -28,6 +27,7 @@ class MainWindow(QMainWindow):
         self.chat = QTextEdit()
         self.chat.setReadOnly(True)
         #self.scrollBar=QScrollBar(self.chat)
+        self.buttchos = QComboBox()
         self.commands = QLineEdit()
         self.commands.setMaximumHeight(25)
         self.envoyer = QPushButton("Envoyer")
@@ -50,7 +50,8 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.buttip, 1, 3)
         grid.addWidget(self.buttname, 1, 4)
         grid.addWidget(self.chat, 2, 0, 3, 5)
-        grid.addWidget(self.commands, 5, 0, 1, 4)
+        grid.addWidget(self.buttchos, 5, 0)
+        grid.addWidget(self.commands, 5, 1, 1, 3)
         grid.addWidget(self.envoyer, 5, 4)
         grid.addWidget(self.conn, 6, 0)
         grid.addWidget(self.ip, 6, 1, 1, 2)
