@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
         self.ip.setMaximumHeight(25)
         self.iport.setMaximumHeight(25)
         self.saveip = QComboBox()
+        self.saveip.addItem('')
         self.conn3 = QPushButton("Se connecter")
         self.conn3.clicked.connect(self.connect2)
         self.conn4 = QLabel("Historique :")
@@ -61,9 +62,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.ip, 6, 1, 1, 2)
         grid.addWidget(self.iport, 6, 3)
         grid.addWidget(self.conn2, 6, 4)
-        grid.addWidget(self.saveip, 7, 1, 1, 3)
-        grid.addWidget(self.conn3, 7, 4)
-        grid.addWidget(self.conn4, 7, 0)
+        # grid.addWidget(self.saveip, 7, 1, 1, 3)
+        # grid.addWidget(self.conn3, 7, 4)
+        # grid.addWidget(self.conn4, 7, 0)
         widget.setLayout(grid)
         self.setWindowTitle("Gestionnaire de Serveurs")
         self.socket_client = None
@@ -158,19 +159,21 @@ class MainWindow(QMainWindow):
                 self.serverpseudo = self.socket_client.recv(1024).decode()
                 self.chat.append(f"Connecté sur {self.host}:{self.port} <-- {self.serverpseudo} !")
                 self.chat.append("____________________________________________\n")
-                entree = f"{self.host} {self.port} <-- {self.serverpseudo}"
-                test = 0
-                for i in range(0, len(self.saveip)):
-                    if self.saveip[i] == entree:
-                        test += 1
-                    else:
-                        pass
+            
+                # entree = f"{self.host} {self.port} <-- {self.serverpseudo}"
+                # test = 0
                 
-                if test >= 0:
-                    pass
-                else:
-                    self.saveip.addItem(entree)
-                    test = 0
+                # for i in range(0, len(self.saveip)):
+                #     if self.saveip[i] == entree:
+                #         test += 1
+                #     else:
+                #         pass
+                
+                # if test >= 0:
+                #     pass
+                # else:
+                #     self.saveip.addItem(entree)
+                #     test = 0
 
     def connect2(self):
             try:
@@ -388,12 +391,12 @@ class MainWindow(QMainWindow):
         box = QMessageBox()
         box.setWindowTitle("Quitter ?")
         box.setText("Voulez vous quitter ?")
-        box.addButton(QMessageBox.Yes)
-        box.addButton(QMessageBox.No)
+        box.addButton(QMessageBox.StandardButton.Yes)
+        box.addButton(QMessageBox.StandardButton.No)
 
         ret = box.exec()
 
-        if ret == QMessageBox.Yes:
+        if ret == QMessageBox.StandardButton.Yes.value:
             try:
                 bye = "disconnect"
                 self.socket_client.send(bye.encode())
