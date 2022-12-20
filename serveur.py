@@ -1,13 +1,14 @@
+
 import socket
 import sys
 import platform
 import subprocess
 import psutil
-import os
 
 host = "0.0.0.0"
 port = 10000
 usnameserver = platform.system() + " " + platform.release()
+os = platform.system()
 data = ""
 
 while data != "kill":
@@ -51,19 +52,80 @@ while data != "kill":
                     conn.send(envoi.encode())
                 else:
                     if data != "kill" and data!="reset" and data!="disconnect":
-                        try:
-                            result = subprocess.run(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-                            result2 = result.stdout.decode('cp1252')
-                        except subprocess.CalledProcessError as err:
-                            print(err)
-                            result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
-                            envoi = f"Commande spécifiée : {data} ---> {result2}"
-                            conn.send(envoi.encode())
-                        else:
-                            if result2 == '':
-                                result2 = 'Commande effectuée.'
-                            envoi = f"Commande spécifiée : {data} ---> {result2}"
-                            conn.send(envoi.encode())
+                        datad = data.split(':')
+                        print(f"{datad[0]} & {datad[1]}")
+                        if datad[0] == '*':
+                            try:
+                                result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                result2 = result.stdout.decode('cp1252')
+                            except subprocess.CalledProcessError as err:
+                                print(err)
+                                result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
+                                envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                conn.send(envoi.encode())
+                            else:
+                                if result2 == '':
+                                    result2 = 'Commande effectuée.'
+                                envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                conn.send(envoi.encode())
+                        elif datad[0] == 'powershell':
+                            if os != 'Windows':
+                                result2 = 'Le système d\'exploitation ne prend pas en charge le terminal que vous souhaitez utiliser. Veuillez changer de terminal.'
+                                envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                conn.send(envoi.encode())
+                            else:
+                                try:
+                                    print("OK")
+                                    result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result2 = result.stdout.decode('cp1252')
+                                except subprocess.CalledProcessError as err:
+                                    print(err)
+                                    result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
+                                else:
+                                    if result2 == '':
+                                        result2 = 'Commande effectuée.'
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
+                        elif datad[0] == 'linux':
+                            if os != 'Linux':
+                                result2 = 'Le système d\'exploitation ne prend pas en charge le terminal que vous souhaitez utiliser. Veuillez changer de terminal.'
+                                envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                conn.send(envoi.encode())
+                            else:
+                                try:
+                                    result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result2 = result.stdout.decode('cp1252')
+                                except subprocess.CalledProcessError as err:
+                                    print(err)
+                                    result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
+                                else:
+                                    if result2 == '':
+                                        result2 = 'Commande effectuée.'
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
+                        elif datad[0] == 'dos':
+                            if os != 'Darwin':
+                                result2 = 'Le système d\'exploitation ne prend pas en charge le terminal que vous souhaitez utiliser. Veuillez changer de terminal.'
+                                envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                conn.send(envoi.encode())
+                            else:
+                                try:
+                                    result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result2 = result.stdout.decode('cp1252')
+                                except subprocess.CalledProcessError as err:
+                                    print(err)
+                                    result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
+                                else:
+                                    if result2 == '':
+                                        result2 = 'Commande effectuée.'
+                                    envoi = f"Commande spécifiée : {datad[1]} ---> {result2}"
+                                    conn.send(envoi.encode())
                     else:
                         pass  
             if data == "disconnect":
