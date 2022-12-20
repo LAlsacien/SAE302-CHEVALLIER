@@ -1,8 +1,8 @@
 import sys
 from xml.dom.minidom import Attr
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
 import socket
 import ipaddress
 
@@ -28,6 +28,10 @@ class MainWindow(QMainWindow):
         self.chat.setReadOnly(True)
         #self.scrollBar=QScrollBar(self.chat)
         self.buttchos = QComboBox()
+        self.buttchos.addItem('')
+        self.buttchos.addItem('Powershell:')
+        self.buttchos.addItem('Linux:')
+        self.buttchos.addItem('DOS:')
         self.commands = QLineEdit()
         self.commands.setMaximumHeight(25)
         self.envoyer = QPushButton("Envoyer")
@@ -122,7 +126,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'avez pas entrée une IP ou un port correcte.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             try:
                 self.host = str(self.ip.text())
@@ -138,7 +142,7 @@ class MainWindow(QMainWindow):
                 msg.setWindowTitle("Erreur !")
                 self.chat.append("Une erreur est survenue. Veuillez vous référer à la fenêtre qui s'est affichée.")
                 self.chat.append("____________________________________________\n")
-                msg.exec_()
+                msg.exec()
             except socket.error as err:
                 print(err)
                 msg = QMessageBox()
@@ -147,7 +151,7 @@ class MainWindow(QMainWindow):
                 self.chat.append("Une erreur est survenue. Veuillez vous référer à la fenêtre qui s'est affichée.")
                 self.chat.append("____________________________________________\n")
                 msg.setWindowTitle("Erreur !")
-                msg.exec_()
+                msg.exec()
             else:
                 self.pseudo = "Client"
                 self.socket_client.send(self.pseudo.encode())
@@ -155,11 +159,18 @@ class MainWindow(QMainWindow):
                 self.chat.append(f"Connecté sur {self.host}:{self.port} <-- {self.serverpseudo} !")
                 self.chat.append("____________________________________________\n")
                 entree = f"{self.host} {self.port} <-- {self.serverpseudo}"
-                test = self.saveip.findText(entree, Qt.MatchContains)
+                test = 0
+                for i in range(0, len(self.saveip)):
+                    if self.saveip[i] == entree:
+                        test += 1
+                    else:
+                        pass
+                
                 if test >= 0:
                     pass
                 else:
                     self.saveip.addItem(entree)
+                    test = 0
 
     def connect2(self):
             try:
@@ -182,7 +193,7 @@ class MainWindow(QMainWindow):
                 msg.setText("Erreur !")
                 msg.setInformativeText('Aucun serveur n\'est enregistré.')
                 msg.setWindowTitle("Erreur !")
-                msg.exec_()
+                msg.exec()
             else:
                 try:
                     self.chat.append(f"Je me connecte sur le serveur {self.host} on {self.port}")
@@ -196,7 +207,7 @@ class MainWindow(QMainWindow):
                     self.chat.append("Une erreur est survenue. Veuillez vous référer à la fenêtre qui s'est affiché.")
                     self.chat.append("____________________________________________\n")
                     msg.setWindowTitle("Erreur !")
-                    msg.exec_()
+                    msg.exec()
                 else: 
                     self.pseudo = "Client"
                     self.socket_client.send(self.pseudo.encode())
@@ -206,8 +217,8 @@ class MainWindow(QMainWindow):
 
     def envoi(self):
         try:
-            envoi = self.commands.text()
-            self.socket_client.send(envoi.encode())
+            comm = str(self.buttchos.currentText()) + str(self.commands.text())
+            self.socket_client.send(comm.encode())
         except (socket.error, AttributeError) as err:
             print(err)
             print("151")
@@ -215,7 +226,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -232,7 +243,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -249,7 +260,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -266,7 +277,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -283,7 +294,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -300,7 +311,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             retour = self.socket_client.recv(1024).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
@@ -315,14 +326,14 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             self.socket_client.close()
             self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             msg = QMessageBox()
             msg.setText("Déconnecté avec succès.")
             msg.setWindowTitle("Déconnexion")
-            msg.exec_()
+            msg.exec()
             self.chat.append("____________________________________________")
 
     def reset(self):
@@ -334,7 +345,7 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             print("Fermeture de la socket")
             try:
@@ -345,13 +356,13 @@ class MainWindow(QMainWindow):
                 msg.setText("Erreur !")
                 msg.setInformativeText(err)
                 msg.setWindowTitle("Erreur !")
-                msg.exec_()
+                msg.exec()
             else:
                 self.chat.append("Vous avez été déconnecté du serveur.")
                 msg = QMessageBox()
                 msg.setText("Réinitialisé avec succès.")
                 msg.setWindowTitle("Réinitialisation")
-                msg.exec_()
+                msg.exec()
                 self.chat.append("____________________________________________")
 
     def kill(self):
@@ -363,14 +374,14 @@ class MainWindow(QMainWindow):
             msg.setText("Erreur !")
             msg.setInformativeText('Vous n\'êtes connecté à aucun serveur.')
             msg.setWindowTitle("Erreur !")
-            msg.exec_()
+            msg.exec()
         else:
             self.socket_client.close()
             self.chat.append("Vous avez été déconnecté du serveur.")
             msg = QMessageBox()
             msg.setText("Tué avec succès.")
             msg.setWindowTitle("Kill")
-            msg.exec_()
+            msg.exec()
             self.chat.append("____________________________________________")
 
     def closeEvent(self, _e: QCloseEvent):
@@ -400,4 +411,4 @@ if not app:
 sae32 = MainWindow()
 sae32.show()
 
-app.exec_()
+app.exec()

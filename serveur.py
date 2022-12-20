@@ -51,15 +51,21 @@ while data != "kill":
                     conn.send(envoi.encode())
                 else:
                     if data != "kill" and data!="reset" and data!="disconnect":
-                        result = subprocess.run(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        result2 = result.stdout.decode('cp1252')
-                        if result2 == "":
-                            result2 = "Commande effectuée."
-                        envoi = f"Commande spécifiée : {data} ---> {result2}"
-                        conn.send(envoi.encode())
+                        try:
+                            result = subprocess.run(data, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                            result2 = result.stdout.decode('cp1252')
+                        except subprocess.CalledProcessError as err:
+                            print(err)
+                            result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
+                            envoi = f"Commande spécifiée : {data} ---> {result2}"
+                            conn.send(envoi.encode())
+                        else:
+                            if result2 == '':
+                                result2 = 'Commande effectuée.'
+                            envoi = f"Commande spécifiée : {data} ---> {result2}"
+                            conn.send(envoi.encode())
                     else:
-                        pass
-                    
+                        pass  
             if data == "disconnect":
                 data = ""
                 print(f"Déconnecté avec succès.")
