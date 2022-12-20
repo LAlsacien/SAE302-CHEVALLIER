@@ -7,6 +7,7 @@ import psutil
 host = "0.0.0.0"
 port = 10000
 usnameserver = platform.system() + " " + platform.release()
+print(usnameserver)
 os = platform.system()
 data = ""
 
@@ -55,8 +56,13 @@ while data != "kill":
                         print(f"{datad[0]} & {datad[1]}")
                         if datad[0] == '*':
                             try:
-                                result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-                                result2 = result.stdout.decode('cp1252')
+                                if os == 'Windows':
+                                    print("Hello Windows!")
+                                    result = subprocess.run(["powershell", "-NonInteractive", "-Command", datad[1]], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result2 = result.stdout.decode('cp1252')
+                                else:
+                                    result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result2 = result.stdout.decode('cp1252')
                             except subprocess.CalledProcessError as err:
                                 print(err)
                                 result2 = "Échec de la commande. Veuillez vérifier la syntaxe ou vérifier s'il ne manque pas des arguments."
@@ -75,7 +81,7 @@ while data != "kill":
                             else:
                                 try:
                                     print("OK")
-                                    result = subprocess.run(datad[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+                                    result = subprocess.run(["powershell", "-NonInteractive", "-Command", datad[1]], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
                                     result2 = result.stdout.decode('cp1252')
                                 except subprocess.CalledProcessError as err:
                                     print(err)

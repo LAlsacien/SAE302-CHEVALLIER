@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
             msg.setWindowTitle("Erreur !")
             msg.exec()
         else:
-            retour = self.socket_client.recv(1024).decode()
+            retour = self.socket_client.recv(40960).decode()
             textFormatted= f"{self.serverpseudo} > {retour}"
             self.chat.append(textFormatted)
     
